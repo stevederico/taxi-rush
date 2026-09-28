@@ -1,0 +1,25 @@
+{
+  "name": "taxi-rush",
+  "version": "0.12.0",
+  "description": "Arcade taxi driving game in the browser. Grab fares, follow the arrow, beat the clock.",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "simulate": "vitest run --config scripts/vitest.sim.config.ts --testTimeout 120000"
+  },
+  "dependencies": {
+    "three": "0.186.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.186.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  }
+}

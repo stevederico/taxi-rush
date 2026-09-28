@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffc21a" />
+    <meta name="description" content="Taxi Rush: an arcade taxi game. Grab fares, follow the arrow and beat the clock." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Taxi Rush" />
+    <meta property="og:title" content="Taxi Rush" />
+    <meta property="og:description" content="Grab fares, follow the arrow and beat the clock. An arcade taxi game you play in the browser." />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A yellow cab racing through a low-poly city under a big green arrow" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Taxi Rush" />
+    <meta name="twitter:description" content="Grab fares, follow the arrow and beat the clock. An arcade taxi game you play in the browser." />
+    <meta name="twitter:image" content="%SITE_URL%/og-image.png" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <title>Taxi Rush</title>
+  </head>
+  <body>
+    <canvas id="view" aria-label="Taxi Rush game view"></canvas>
+
+    <div id="hud" class="hud" hidden>
+      <div class="hud-side hud-left">
+        <div class="clock" id="clock-box">
+          <div class="clock-value" id="clock">60</div>
+          <div class="label">Time</div>
+        </div>
+        <div class="panel fare-panel" id="fare-panel">
+          <div class="label" id="fare-label">Find A Fare</div>
+          <div class="fare-name" id="fare-name">Stop In A Ring</div>
+          <div class="meter"><div class="meter-fill" id="fare-meter"></div></div>
+        </div>
+        <div class="hud-buttons">
+          <button type="button" class="icon-button" id="pause-button" aria-label="Pause Game">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /></svg>
+          </button>
+          <button type="button" class="icon-button" id="mute-button" aria-label="Mute Sound">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" /><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" /><path class="cross" d="M16 9l5 6M21 9l-5 6" /></svg>
+          </button>
+        </div>
+      </div>
+      <div class="hud-side hud-right">
+        <div class="panel cash-panel">
+          <div class="label">Cash</div>
+          <div class="cash-value">$<span id="cash">0</span></div>
+        </div>
+        <canvas id="minimap" class="minimap" width="160" height="160" aria-label="City map"></canvas>
+      </div>
+      <div class="combo" id="combo" hidden>
+        <span id="combo-value">x2</span>
+        <span class="label">Combo</span>
+      </div>
+      <div class="banner" id="banner" aria-live="polite"></div>
+      <div class="popups" id="popups"></div>
+      <div class="speed"><span id="speed">0</span><span class="label">km/h</span></div>
+      <div class="touch" id="touch">
+        <div class="touch-group">
+          <button type="button" class="pad" data-pad="left" aria-label="Steer Left">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 4.5L7 12l8.5 7.5z" /></svg>
+          </button>
+          <button type="button" class="pad" data-pad="right" aria-label="Steer Right">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 4.5L17 12l-8.5 7.5z" /></svg>
+          </button>
+        </div>
+        <div class="touch-group touch-pedals">
+          <button type="button" class="pad pad-small pad-drift" data-pad="drift" aria-label="Drift">Drift</button>
+          <button type="button" class="pad pad-small" data-pad="brake" aria-label="Brake">Brake</button>
+          <button type="button" class="pad pad-gas" data-pad="gas" aria-label="Gas">Gas</button>
+        </div>
+      </div>
+    </div>
+
+    <section id="title" class="screen" aria-labelledby="title-name">
+      <div class="card">
+        <div class="checker" aria-hidden="true"></div>
+        <h1 class="logo" id="title-name"><span>Taxi</span><span class="logo-rush">Rush</span></h1>
+        <p class="tagline">Grab fares. Follow the arrow. Beat the clock.</p>
+        <button type="button" class="primary" id="start-button">Start Shift</button>
+        <ul class="how">
+          <li><b>Stop</b> in a glowing ring to pick up a fare</li>
+          <li><b>Race</b> to the green beam before patience runs out</li>
+          <li><b>Near misses, jumps and drifts</b> pay tips and build combos</li>
+          <li><b>Every fare</b> adds time to the clock</li>
+        </ul>
+        <div class="keys keys-desktop">
+          <span><kbd>W A S D</kbd> or <kbd>Arrows</kbd> Drive</span>
+          <span><kbd>Space</kbd> Drift</span>
+          <span><kbd>P</kbd> Pause</span>
+          <span><kbd>M</kbd> Mute</span>
+        </div>
+        <div class="keys keys-touch"><span>Use the on-screen buttons to drive</span></div>
+        <p class="best" id="title-best" hidden>Best Shift: $<span id="title-best-value">0</span></p>
+      </div>
+    </section>
+
+    <section id="pause" class="screen" hidden aria-labelledby="pause-name">
+      <div class="card card-small">
+        <h2 class="heading" id="pause-name">Paused</h2>
+        <button type="button" class="primary" id="resume-button">Keep Driving</button>
+        <button type="button" class="secondary" id="quit-button">End Shift</button>
+      </div>
+    </section>
+
+    <section id="over" class="screen" hidden aria-labelledby="over-name">
+      <div class="card">
+        <div class="checker" aria-hidden="true"></div>
+        <h2 class="heading" id="over-name">Shift Over</h2>
+        <p class="rank" id="over-rank">Rookie Cabbie</p>
+        <p class="total">$<span id="over-cash">0</span></p>
+        <p class="best new-best" id="over-new-best" hidden>New Best Shift</p>
+        <p class="best" id="over-best">Best Shift: $<span id="over-best-value">0</span></p>
+        <dl class="stats">
+          <div><dt>Fares</dt><dd id="stat-fares">0</dd></div>
+          <div><dt>Tips</dt><dd id="stat-tips">$0</dd></div>
+          <div><dt>Best Combo</dt><dd id="stat-combo">x1</dd></div>
+          <div><dt>Longest Jump</dt><dd id="stat-jump">0.0s</dd></div>
+          <div><dt>Top Speed</dt><dd id="stat-speed">0 km/h</dd></div>
+          <div><dt>Time Driven</dt><dd id="stat-time">0:00</dd></div>
+        </dl>
+        <p class="next" id="over-next"></p>
+        <button type="button" class="primary" id="again-button">Drive Again</button>
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

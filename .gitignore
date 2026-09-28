@@ -1,0 +1,15 @@
+node_modules
+dist
+.agent-browser
+.env
+.env.local
+*.log
+.DS_Store
+
+# Local notes, not part of the game
+BRIEF.md
+SUMMARY.md
+
+# npm is the package manager; keep package-lock.json only
+bun.lock
+bun.lockb
